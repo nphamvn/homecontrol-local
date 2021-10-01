@@ -1,3 +1,0 @@
-obj/Debug/net5.0/Protos/Light.cs \
-obj/Debug/net5.0/Protos/LightGrpc.cs: /home/nam/.nuget/packages/grpc.tools/2.34.0/build/native/include/google/protobuf/empty.proto\
- Protos/light.proto
