@@ -4,28 +4,24 @@ using Microsoft.Extensions.Options;
 
 namespace HomeControl.Devices.SDK.Controllers
 {
-    public class LightController
+    public class LightRemoteController
     {
-        public LightController(IOptions<LightOptions> options)
+        public LightRemoteController(IOptions<LightOptions> options)
         {
 
         }
 
-        public async Task TurnOnLight()
-        {
-
-        }
-        public async Task TurnOffLight()
+        public async Task PushPowerButton()
         {
 
         }
 
-        public async Task BrightenLight()
+        public async Task PushBrightenLightButton()
         {
 
         }
 
-        public async Task DimLight()
+        public async Task PushDimLightButtons()
         {
 
         }
