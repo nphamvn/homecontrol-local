@@ -2,9 +2,9 @@ using System.Threading.Tasks;
 
 namespace GpioDevicesService.Services.Interfaces
 {
-    public interface ICacheService<T>
+    public interface ICacheService
     {
-        Task<T> Get();
-        Task<T> Set(T value);
+        Task<T> Get<T>();
+        Task<T> Set<T>(T value);
     }
 }

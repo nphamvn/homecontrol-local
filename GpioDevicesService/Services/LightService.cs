@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Google.Protobuf.WellKnownTypes;
+using GpioDevicesService.Models;
 using GpioDevicesService.Services.Interfaces;
 using Grpc.Core;
 using HomeControl.Devices.SDK.Controllers;
@@ -10,9 +11,9 @@ namespace GpioDevicesService.Services
     public class LightService : Light.LightBase
     {
         private readonly LightRemoteController _controller;
-        private readonly ICacheService<Models.LightRecord> _cache;
+        private readonly ICacheService _cache;
 
-        public LightService(LightRemoteController controller, ICacheService<GpioDevicesService.Models.LightRecord> cache)
+        public LightService(LightRemoteController controller, ICacheService cache)
         {
             _controller = controller;
             _cache = cache;
@@ -21,7 +22,7 @@ namespace GpioDevicesService.Services
         {
             //Read from cache service or file
             //return base.GetStatus(request, context);
-            var current = await _cache.Get();
+            var current = await _cache.Get<LightRecord>();
             return new LightReply
             {
                 Brightness = current.Brightness,
@@ -32,7 +33,7 @@ namespace GpioDevicesService.Services
         public override async Task<LightReply> TurnOnLight(Empty request, ServerCallContext context)
         {
             //Read current state from cache
-            var current = await _cache.Get();
+            var current = await _cache.Get<LightRecord>();
 
             //TODO: do logic then push button
             if (current.Mode == "OFF")
@@ -56,7 +57,7 @@ namespace GpioDevicesService.Services
         public override async Task<LightReply> TurnOffLight(Empty request, ServerCallContext context)
         {
             //Read current state from cache
-            var current = await _cache.Get();
+            var current = await _cache.Get<LightRecord>();
 
             //TODO: do logic then push button
             if (current.Mode == "ON")

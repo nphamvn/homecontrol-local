@@ -4,7 +4,7 @@ using Microsoft.Extensions.Caching.Distributed;
 
 namespace GpioDevicesService.Services
 {
-    public class CacheService<T> : ICacheService<T>
+    public class CacheService : ICacheService
     {
         private readonly IDistributedCache _distributedCache;
 
@@ -12,12 +12,13 @@ namespace GpioDevicesService.Services
         {
             _distributedCache = distributedCache;
         }
-        public Task<T> Get()
+
+        public Task<T> Get<T>()
         {
             throw new System.NotImplementedException();
         }
 
-        public Task<T> Set(T value)
+        public Task<T> Set<T>(T value)
         {
             throw new System.NotImplementedException();
         }

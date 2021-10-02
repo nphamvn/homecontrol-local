@@ -1,30 +1,68 @@
 using System.Threading.Tasks;
 using Google.Protobuf.WellKnownTypes;
+using GpioDevicesService.Models;
+using GpioDevicesService.Services.Interfaces;
 using Grpc.Core;
+using HomeControl.Devices.SDK.Controllers;
 
 namespace GpioDevicesService.Services
 {
     public class AirConditionerService : AirConditioner.AirConditionerBase
     {
-        public AirConditionerService()
-        {
+        private readonly AirConRemoteController _remoteController;
+        private readonly ICacheService _cacheService;
 
-        }
-        public override Task<AirConditionerReply> TurnOnCooler(Empty request, ServerCallContext context)
+        public AirConditionerService(AirConRemoteController remoteController, ICacheService cacheService)
         {
-            return base.TurnOnCooler(request, context);
+            _remoteController = remoteController;
+            _cacheService = cacheService;
         }
-        public override Task<AirConditionerReply> TurnOnHeater(Empty request, ServerCallContext context)
+        public override async Task<AirConditionerReply> TurnOnCooler(Empty request, ServerCallContext context)
         {
-            return base.TurnOnHeater(request, context);
+            //return base.TurnOnCooler(request, context);
+            var currentState = await _cacheService.Get<AirConditionerRecord>();
+            await _remoteController.PushCoolerButton();
+            var newState = currentState with { Mode = "COOLER" };
+            return new AirConditionerReply
+            {
+                Mode = newState.Mode,
+                Temperature = newState.Temperature
+            };
         }
-        public override Task<AirConditionerReply> IncreaseTemperature(Empty request, ServerCallContext context)
+        public override async Task<AirConditionerReply> TurnOnHeater(Empty request, ServerCallContext context)
         {
-            return base.IncreaseTemperature(request, context);
+            var currentState = await _cacheService.Get<AirConditionerRecord>();
+            await _remoteController.PushHeaterButton();
+            var newState = currentState with { Mode = "HEATER" };
+            return new AirConditionerReply
+            {
+                Mode = newState.Mode,
+                Temperature = newState.Temperature
+            };
         }
-        public override Task<AirConditionerReply> DecreaseTemperature(Empty request, ServerCallContext context)
+        public override async Task<AirConditionerReply> IncreaseTemperature(Empty request, ServerCallContext context)
         {
-            return base.DecreaseTemperature(request, context);
+            var currentState = await _cacheService.Get<AirConditionerRecord>();
+            await _remoteController.PushIncTempButton();
+            int temperature = currentState.Temperature + 1;
+            var newState = currentState with { Temperature = temperature };
+            return new AirConditionerReply
+            {
+                Mode = newState.Mode,
+                Temperature = newState.Temperature
+            };
+        }
+        public override async Task<AirConditionerReply> DecreaseTemperature(Empty request, ServerCallContext context)
+        {
+            var currentState = await _cacheService.Get<AirConditionerRecord>();
+            await _remoteController.PushIncTempButton();
+            int temperature = currentState.Temperature - 1;
+            var newState = currentState with { Temperature = temperature };
+            return new AirConditionerReply
+            {
+                Mode = newState.Mode,
+                Temperature = newState.Temperature
+            };
         }
     }
 }
