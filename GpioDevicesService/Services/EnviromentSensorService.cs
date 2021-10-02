@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using AutoMapper;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using HomeControl.Devices.SDK.Controllers;
@@ -8,26 +9,22 @@ namespace GpioDevicesService.Services
     public class EnvironmentSensorService : EnvironmentSensor.EnvironmentSensorBase
     {
         private readonly EnvironmentSensorController _controller;
+        private readonly IMapper _mapper;
 
-        public EnvironmentSensorService(EnvironmentSensorController controller)
+        public EnvironmentSensorService(EnvironmentSensorController controller, IMapper mapper)
         {
             _controller = controller;
+            _mapper = mapper;
         }
-
-        public override async Task<SensorReply> GetSensorData(Empty request, ServerCallContext context)
+        public override async Task<EnvironmentSensorReply> GetSensorData(Empty request, ServerCallContext context)
         {
             var result = _controller.ReadSensorData();
-            return Map(result);
+            return _mapper.Map<EnvironmentSensorReply>(result);
         }
-
-        private static SensorReply Map(HomeControl.Devices.SDK.Models.EnvironmentSensorData value)
-        {
-            return new SensorReply
-            {
-                Temperature = value.Temperature,
-                Humindity = value.Humidity,
-                Time = value.ReadingTime.ToString("yyyyMMdd HHmmss")
-            };
-        }
+        // public override async Task<EnvironmentSensorReply> GetSensorData(Empty request, ServerCallContext context)
+        // {
+        //     // var result = _controller.ReadSensorData();
+        //     // return Map(result);
+        // }
     }
 }

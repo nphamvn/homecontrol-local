@@ -9,11 +9,11 @@ package greet;
 // The light control service definition.
 service EnvironmentSensor {
   // Get current state
-  rpc GetSensorData (google.protobuf.Empty) returns (SensorReply);
+  rpc GetSensorData (google.protobuf.Empty) returns (EnvironmentSensorReply);
 }
 
 // The response message containing the brightness.
-message SensorReply {
+message EnvironmentSensorReply {
   double temperature = 1;
   double humindity = 2;
   string time = 3;
