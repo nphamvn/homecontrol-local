@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GpioDevicesService.Services;
+using GpioDevicesService.Services.Interfaces;
+using HomeControl.Devices.SDK.Controllers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -18,6 +20,17 @@ namespace GpioDevicesService
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddGrpc();
+            services.AddGrpcReflection();
+
+            //Add Redis cache for CacheService
+            services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = "localhost:6379";
+            });
+            //Add Cache service
+            services.AddSingleton<ICacheService, RedisCacheService>();
+            services.AddAutoMapper(typeof(Startup));
+            services.AddSingleton<LightRemoteController>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -34,6 +47,7 @@ namespace GpioDevicesService
             {
                 endpoints.MapGrpcService<LightService>();
                 endpoints.MapGrpcService<AirConditionerService>();
+                endpoints.MapGrpcReflectionService();
 
                 endpoints.MapGet("/", async context =>
                 {
